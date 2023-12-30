@@ -1,44 +1,44 @@
+const bd = require('./bd')
 const express = require('express')
 const app = express()
 
 app.use(express.json())
 
+let fucao = bd.AlunosDatabase()
 
-let alunos = []
 
-app.get('/users', (req, res)=>{
+
+app.get('/users',async (req, res)=>{
     console.log('Está no GET')
-    res.status(200).send({alunos:alunos})
+    res.status(200).send(await fucao.list())
     return
 })
 
-app.get('/users/:id', (req, res)=>{
+app.get('/users/:id',async (req, res)=>{
     let alunoId = req.params.id
     console.log('Está no GET')
-    res.status(200).send(alunos.find(x => x.id == alunoId))
+    res.status(200).send( await fucao.get(alunoId))
     return
 })
 
-app.post('/users', (req, res)=>{
+app.post('/users', async (req, res)=>{
     console.log('Está no POST')
-    alunos.push(req.body)
-    res.status(200).send(req.body)
+    res.status(200).send( await fucao.insert(req.body))
     return
 })
 
-app.put('/users/:id', (req, res)=>{
-    let alunoId = req.params.id
-    alunos.splice(alunoId - 1, 1, req.body)
+app.put('/users/:id', async (req, res)=>{
+
     console.log('Está no PUT')
-    res.status(200).send(alunos.find(x => x.id == alunoId))
+    res.status(200).send(await fucao.update(req.body, req.params.id))
     return
 })
 
-app.delete('/users/:id', (req, res)=>{
-    let alunoId = req.params.id
+app.delete('/users/:id', async (req, res)=>{
+   
     console.log('Está no DELETE')
-    alunos.splice(alunoId -1, 1)
-    res.status(200).send(alunos.find(x=>x.id == alunoId))
+    await fucao.del(req.params.id)
+    res.status(200).send("Texto excluído com sucesso!")
     return
 })
 app.listen(2000, ()=>{
